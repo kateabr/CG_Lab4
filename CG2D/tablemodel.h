@@ -35,6 +35,15 @@ public:
     emit dataChanged(top, bottom);
   }
 
+  bool removeRows(int row, int count,
+                  const QModelIndex &parent = QModelIndex()) override {
+    beginRemoveRows(QModelIndex(), row, row + count - 1);
+    while (count--)
+      delete drawables.takeAt(row);
+    endRemoveRows();
+    return true;
+  }
+
 private:
   QVector<Drawable *> drawables;
 };

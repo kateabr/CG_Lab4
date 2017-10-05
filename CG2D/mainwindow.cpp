@@ -19,6 +19,11 @@ MainWindow::MainWindow(QWidget *parent)
 
   ui->primitivesList->setModel(tModel);
   ui->canvas->setTableModel(tModel);
+
+  connect(ui->primitivesList, &MyListView::itemRemoved, [&]() {
+    ui->canvas->clearArea();
+    ui->canvas->repaint();
+  });
 }
 
 MainWindow::~MainWindow() { delete ui; }
