@@ -36,6 +36,7 @@ private:
   int penThickness = 2;
   TableModel *tModel;
   Primitives currentPrimitive;
+  QVector<QPoint> polygonTemporary;
 };
 
 #endif // PAINTCANVAS_H

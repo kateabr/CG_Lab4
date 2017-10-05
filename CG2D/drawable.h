@@ -48,4 +48,23 @@ public:
   }
 };
 
+class DrawablePolygon : public Drawable {
+private:
+  QVector<QPoint> points;
+
+public:
+  DrawablePolygon(QVector<QPoint> ps) : points(ps) {}
+  void draw(QPixmap &pixmap) const override {
+    QPainter p(&pixmap);
+    p.setBrush(QBrush(Qt::black));
+    p.setPen(QPen(Qt::black, 2));
+    for (int i = 0; i < points.size(); ++i)
+      p.drawLine(points[i], points[(i + 1) % points.size()]);
+  }
+
+  QString toString() override {
+    return "Polygon (" + QString::number(points.size()) + " angles)";
+  }
+};
+
 #endif // DRAWABLE_H

@@ -40,8 +40,12 @@ void PaintCanvas::mousePressEvent(QMouseEvent *e) {
       mousePressed = true;
       break;
     case Primitives::Polygon:
+      polygonTemporary.push_back(curPos);
       break;
     }
+  } else if (e->buttons() & Qt::RightButton && (!polygonTemporary.empty())) {
+    tModel->add(new DrawablePolygon(polygonTemporary));
+    polygonTemporary.clear();
   }
   pixmap.fill();
   repaint();
