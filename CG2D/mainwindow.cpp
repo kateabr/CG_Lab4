@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "primitives.h"
+#include "tablemodel.h"
 #include "ui_mainwindow.h"
 #include <functional>
 
@@ -13,6 +14,11 @@ MainWindow::MainWindow(QWidget *parent)
   connect(ui->selectedPoint, &QRadioButton::clicked, funPoint);
   connect(ui->selectedLine, &QRadioButton::clicked, funLine);
   connect(ui->selectedPolygon, &QRadioButton::clicked, funPolygon);
+
+  TableModel *tModel = new TableModel();
+
+  ui->primitivesList->setModel(tModel);
+  ui->canvas->setTableModel(tModel);
 }
 
 MainWindow::~MainWindow() { delete ui; }

@@ -12,6 +12,8 @@ QPixmap PaintCanvas::getPixmap() const { return pixmap; }
 
 void PaintCanvas::setCurrentPrimitive(Primitives p) { currentPrimitive = p; }
 
+void PaintCanvas::setTableModel(TableModel *tM) { tModel = tM; }
+
 void PaintCanvas::setThickness(int val) { penThickness = val; }
 
 void PaintCanvas::clearArea() {
@@ -21,7 +23,7 @@ void PaintCanvas::clearArea() {
 
 void PaintCanvas::paintEvent(QPaintEvent *) {
   pixmap.fill();
-  for (Drawable *d : drawables)
+  for (Drawable *d : tModel->getData())
     d->draw(pixmap);
   QPainter p(this);
   p.drawPixmap(0, 0, pixmap);
@@ -32,19 +34,24 @@ void PaintCanvas::mousePressEvent(QMouseEvent *e) {
   if (e->buttons() & Qt::LeftButton) {
     switch (currentPrimitive) {
     case Primitives::Point:
-      drawables.push_back(new DrawablePoint(curPos));
-      break;
-    case Primitives::Line:
+      tModel->add(new DrawablePoint(curPos));
       break;
     case Primitives::Polygon:
       break;
     }
   } else
     mousePressed = true;
+
   repaint();
 }
 
-void PaintCanvas::mouseReleaseEvent(QMouseEvent *) { mousePressed = false; }
+void PaintCanvas::mouseReleaseEvent(QMouseEvent *e) {
+  mousePressed = false;
+  if (currentPrimitive == Primitives::Line) {
+    tModel->add(new DrawableLine(curPos, e->pos()));
+    repaint();
+  }
+}
 
 void PaintCanvas::mouseMoveEvent(QMouseEvent *e) {
   if (!mousePressed)

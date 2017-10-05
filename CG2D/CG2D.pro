@@ -32,7 +32,8 @@ HEADERS += \
         mainwindow.h \
     paintcanvas.h \
     drawable.h \
-    primitives.h
+    primitives.h \
+    tablemodel.h
 
 FORMS += \
         mainwindow.ui

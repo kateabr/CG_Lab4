@@ -3,6 +3,7 @@
 
 #include "drawable.h"
 #include "primitives.h"
+#include "tablemodel.h"
 #include <QtWidgets>
 
 class PaintCanvas : public QFrame {
@@ -13,6 +14,7 @@ public:
   void setColor(QColor c);
   QPixmap getPixmap() const;
   void setCurrentPrimitive(Primitives p);
+  void setTableModel(TableModel *tM);
 
 public slots:
   void setThickness(int);
@@ -21,7 +23,7 @@ public slots:
 protected:
   void paintEvent(QPaintEvent *);
   void mousePressEvent(QMouseEvent *);
-  void mouseReleaseEvent(QMouseEvent *);
+  void mouseReleaseEvent(QMouseEvent *e);
   void mouseMoveEvent(QMouseEvent *);
   void resizeEvent(QResizeEvent *);
 
@@ -32,7 +34,7 @@ private:
   QPixmap pixmap;
   QPoint curPos;
   int penThickness = 2;
-  QVector<Drawable *> drawables;
+  TableModel *tModel;
   Primitives currentPrimitive;
 };
 
