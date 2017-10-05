@@ -30,7 +30,9 @@ SOURCES += \
 
 HEADERS += \
         mainwindow.h \
-    paintcanvas.h
+    paintcanvas.h \
+    drawable.h \
+    primitives.h
 
 FORMS += \
         mainwindow.ui

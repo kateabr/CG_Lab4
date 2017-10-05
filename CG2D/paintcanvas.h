@@ -1,41 +1,39 @@
 #ifndef PAINTCANVAS_H
 #define PAINTCANVAS_H
 
+#include "drawable.h"
+#include "primitives.h"
 #include <QtWidgets>
 
 class PaintCanvas : public QFrame {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    PaintCanvas(QWidget* parent = nullptr);
-    void setColor(QColor c);
-    QPixmap getPixmap() const;
-    void setFillMethod(bool v);
-    void setImagePattern(QImage ppattern);
+  PaintCanvas(QWidget *parent = nullptr);
+  void setColor(QColor c);
+  QPixmap getPixmap() const;
+  void setCurrentPrimitive(Primitives p);
 
 public slots:
-    void setThickness(int);
-    void clearArea();
+  void setThickness(int);
+  void clearArea();
 
 protected:
-    void paintEvent(QPaintEvent*);
-    void mousePressEvent(QMouseEvent*);
-    void mouseReleaseEvent(QMouseEvent*);
-    void mouseMoveEvent(QMouseEvent*);
-    void resizeEvent(QResizeEvent*);
+  void paintEvent(QPaintEvent *);
+  void mousePressEvent(QMouseEvent *);
+  void mouseReleaseEvent(QMouseEvent *);
+  void mouseMoveEvent(QMouseEvent *);
+  void resizeEvent(QResizeEvent *);
 
 private:
-    QColor color = Qt::black;
-    QColor bgColor = Qt::white;
-    bool mousePressed = false;
-    QPixmap pixmap;
-    QPoint curPos;
-    int penThickness = 2;
-    void colorFill(QPoint curPos);
-    void imageFill(QPoint basePos);
-    bool fillMethod = false; // false = color, true = image
-    QImage pattern;
-    bool patternLoaded;
+  QColor color = Qt::black;
+  QColor bgColor = Qt::white;
+  bool mousePressed = false;
+  QPixmap pixmap;
+  QPoint curPos;
+  int penThickness = 2;
+  QVector<Drawable *> drawables;
+  Primitives currentPrimitive;
 };
 
 #endif // PAINTCANVAS_H
