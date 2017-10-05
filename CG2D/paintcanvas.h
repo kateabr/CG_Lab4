@@ -35,7 +35,7 @@ private:
   QPoint curPos;
   int penThickness = 2;
   TableModel *tModel;
-  Primitives currentPrimitive;
+  Primitives currentPrimitive = Primitives::Point;
   QVector<QPoint> polygonTemporary;
 };
 
