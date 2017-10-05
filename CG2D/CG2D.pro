@@ -34,7 +34,8 @@ HEADERS += \
     drawable.h \
     primitives.h \
     tablemodel.h \
-    mylistview.h
+    mylistview.h \
+    matrix3x2.h
 
 FORMS += \
         mainwindow.ui
