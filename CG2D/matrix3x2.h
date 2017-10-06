@@ -31,8 +31,8 @@ public:
   Matrix3x2 &operator=(const Matrix3x2 &) = default;
   Matrix3x2 &operator=(Matrix3x2 &&) = default;
 
-  QPoint mul(const QPoint &p) {
-    QPoint res;
+  QPointF mul(const QPointF &p) {
+    QPointF res;
     res.setX(p.x() * m[0] + p.y() * m[2] + m[4]);
     res.setY(p.x() * m[1] + p.y() * m[3] + m[5]);
     return res;

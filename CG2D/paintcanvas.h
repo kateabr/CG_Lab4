@@ -32,11 +32,11 @@ private:
   QColor bgColor = Qt::white;
   bool mousePressed = false;
   QPixmap pixmap;
-  QPoint curPos;
+  QPointF curPos;
   int penThickness = 2;
   TableModel *tModel;
   Primitives currentPrimitive = Primitives::Point;
-  QVector<QPoint> polygonTemporary;
+  QVector<QPointF> polygonTemporary;
 };
 
 #endif // PAINTCANVAS_H

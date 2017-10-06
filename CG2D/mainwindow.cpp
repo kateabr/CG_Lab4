@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "matrix3x2.h"
 #include "primitives.h"
 #include "tablemodel.h"
 #include "ui_mainwindow.h"
@@ -20,10 +21,25 @@ MainWindow::MainWindow(QWidget *parent)
   ui->primitivesList->setModel(tModel);
   ui->canvas->setTableModel(tModel);
 
-  connect(ui->primitivesList, &MyListView::itemRemoved, [&]() {
+  connect(ui->primitivesList, &MyListView::itemsChanged, [&]() {
     ui->canvas->clearArea();
     ui->canvas->repaint();
   });
 }
 
 MainWindow::~MainWindow() { delete ui; }
+
+void MainWindow::on_applyButton_clicked() {
+  float scaleX = ui->scaleX->value() != 0 ? ui->scaleX->value() : 1;
+  float scaleY = ui->scaleY->value() != 0 ? ui->scaleY->value() : 1;
+  float rad = 0.01745329252 * ui->rotationAngle->value();
+  bool zeroAngle = rad == 0;
+  Matrix3x2 m(scaleX * (zeroAngle ? 1 : qCos(rad)), zeroAngle ? 0 : qSin(rad),
+              zeroAngle ? 0 : -qSin(rad), scaleY * (zeroAngle ? 1 : qCos(rad)),
+              ui->trX->value(), ui->trY->value());
+  Matrix3x2 p(1, 0, 0, 1, -ui->pivotX->value(), -ui->pivotY->value());
+  ui->primitivesList->update(p, false);
+  ui->primitivesList->update(m, false);
+  Matrix3x2 pp(1, 0, 0, 1, ui->pivotX->value(), ui->pivotY->value());
+  ui->primitivesList->update(pp);
+}

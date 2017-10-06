@@ -2,6 +2,7 @@
 #define TABLEMODEL_H
 
 #include "drawable.h"
+#include "matrix3x2.h"
 #include <QtWidgets>
 
 class TableModel : public QAbstractListModel {
@@ -42,6 +43,11 @@ public:
       delete drawables.takeAt(row);
     endRemoveRows();
     return true;
+  }
+
+  void update(Matrix3x2 &tr, QModelIndexList &list) {
+    for (int i = 0; i < list.size(); ++i)
+      drawables[list[i].row()]->update(tr);
   }
 
 private:

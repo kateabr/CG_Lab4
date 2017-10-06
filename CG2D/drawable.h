@@ -1,25 +1,27 @@
 #ifndef DRAWABLE_H
 #define DRAWABLE_H
 
+#include "matrix3x2.h"
 #include <QtWidgets>
 
 class Drawable {
 public:
   virtual void draw(QPixmap &pixmap) const = 0;
   virtual QString toString() = 0;
+  virtual void update(Matrix3x2 &tr) = 0;
 
 protected:
-  QString pToStr(QPoint const &p) {
+  QString pToStr(QPointF const &p) {
     return "(" + QString::number(p.x()) + ", " + QString::number(p.y()) + ")";
   }
 };
 
 class DrawablePoint : public Drawable {
 private:
-  QPoint center;
+  QPointF center;
 
 public:
-  DrawablePoint(QPoint p) : center(p) {}
+  DrawablePoint(QPointF p) : center(p) {}
   void draw(QPixmap &pixmap) const override {
     QPainter p(&pixmap);
     p.setBrush(QBrush(Qt::black));
@@ -27,20 +29,27 @@ public:
     p.drawEllipse(center, 3, 3);
   }
 
+  void update(Matrix3x2 &tr) override { center = tr.mul(center); }
+
   QString toString() override { return "Point " + pToStr(center); }
 };
 
 class DrawableLine : public Drawable {
 private:
-  QPoint p1, p2;
+  QPointF p1, p2;
 
 public:
-  DrawableLine(QPoint pFrom, QPoint pTo) : p1(pFrom), p2(pTo) {}
+  DrawableLine(QPointF pFrom, QPointF pTo) : p1(pFrom), p2(pTo) {}
   void draw(QPixmap &pixmap) const override {
     QPainter p(&pixmap);
     p.setBrush(QBrush(Qt::black));
     p.setPen(QPen(Qt::black, 2));
     p.drawLine(p1, p2);
+  }
+
+  void update(Matrix3x2 &tr) override {
+    p1 = tr.mul(p1);
+    p2 = tr.mul(p2);
   }
 
   QString toString() override {
@@ -50,16 +59,21 @@ public:
 
 class DrawablePolygon : public Drawable {
 private:
-  QVector<QPoint> points;
+  QVector<QPointF> points;
 
 public:
-  DrawablePolygon(QVector<QPoint> ps) : points(ps) {}
+  DrawablePolygon(QVector<QPointF> ps) : points(ps) {}
   void draw(QPixmap &pixmap) const override {
     QPainter p(&pixmap);
     p.setBrush(QBrush(Qt::black));
     p.setPen(QPen(Qt::black, 2));
     for (int i = 0; i < points.size(); ++i)
       p.drawLine(points[i], points[(i + 1) % points.size()]);
+  }
+
+  void update(Matrix3x2 &tr) override {
+    for (int i = 0; i < points.size(); ++i)
+      points[i] = tr.mul(points[i]);
   }
 
   QString toString() override {

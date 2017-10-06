@@ -61,12 +61,6 @@
        <layout class="QGridLayout" name="gridLayout_5">
         <item row="0" column="0">
          <layout class="QGridLayout" name="gridLayout_6">
-          <item row="2" column="2">
-           <widget class="QSpinBox" name="spinBox_5"/>
-          </item>
-          <item row="2" column="1">
-           <widget class="QSpinBox" name="spinBox_3"/>
-          </item>
           <item row="1" column="0">
            <widget class="QLabel" name="rotateLabel">
             <property name="text">
@@ -82,7 +76,14 @@
            </widget>
           </item>
           <item row="1" column="1" colspan="2">
-           <widget class="QSpinBox" name="spinBox_2"/>
+           <widget class="QSpinBox" name="rotationAngle">
+            <property name="minimum">
+             <number>-359</number>
+            </property>
+            <property name="maximum">
+             <number>359</number>
+            </property>
+           </widget>
           </item>
           <item row="0" column="0">
            <widget class="QLabel" name="translateLabel">
@@ -92,10 +93,37 @@
            </widget>
           </item>
           <item row="0" column="2">
-           <widget class="QSpinBox" name="spinBox_4"/>
+           <widget class="QSpinBox" name="trY"/>
           </item>
           <item row="0" column="1">
-           <widget class="QSpinBox" name="spinBox"/>
+           <widget class="QSpinBox" name="trX"/>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Pivot</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QDoubleSpinBox" name="scaleX"/>
+          </item>
+          <item row="3" column="1">
+           <widget class="QSpinBox" name="pivotX">
+            <property name="maximum">
+             <number>999</number>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QSpinBox" name="pivotY">
+            <property name="maximum">
+             <number>999</number>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QDoubleSpinBox" name="scaleY"/>
           </item>
          </layout>
         </item>
