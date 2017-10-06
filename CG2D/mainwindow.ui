@@ -98,13 +98,6 @@
           <item row="0" column="1">
            <widget class="QSpinBox" name="trX"/>
           </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>Pivot</string>
-            </property>
-           </widget>
-          </item>
           <item row="2" column="1">
            <widget class="QDoubleSpinBox" name="scaleX"/>
           </item>
@@ -115,6 +108,9 @@
             </property>
            </widget>
           </item>
+          <item row="2" column="2">
+           <widget class="QDoubleSpinBox" name="scaleY"/>
+          </item>
           <item row="3" column="2">
            <widget class="QSpinBox" name="pivotY">
             <property name="maximum">
@@ -122,8 +118,19 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="2">
-           <widget class="QDoubleSpinBox" name="scaleY"/>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Pivot</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" colspan="3">
+           <widget class="QCheckBox" name="centerAsPivot">
+            <property name="text">
+             <string>Use primitive's center as a pivot</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>

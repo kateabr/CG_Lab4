@@ -10,10 +10,10 @@ class MyListView : public QListView {
 public:
   MyListView(QWidget *parent = nullptr) : QListView(parent) {}
 
-  void update(Matrix3x2 &tr, bool redraw = true) {
+  void update(Matrix3x2 &tr, bool center, bool redraw = true) {
     if ((model()->rowCount() > 0) && (!selectedIndexes().empty())) {
       auto list = selectedIndexes();
-      static_cast<TableModel *>(model())->update(tr, list);
+      static_cast<TableModel *>(model())->update(tr, list, center);
       if (redraw)
         emit itemsChanged();
     }

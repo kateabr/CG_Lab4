@@ -37,9 +37,12 @@ void MainWindow::on_applyButton_clicked() {
   Matrix3x2 m(scaleX * (zeroAngle ? 1 : qCos(rad)), zeroAngle ? 0 : qSin(rad),
               zeroAngle ? 0 : -qSin(rad), scaleY * (zeroAngle ? 1 : qCos(rad)),
               ui->trX->value(), ui->trY->value());
-  Matrix3x2 p(1, 0, 0, 1, -ui->pivotX->value(), -ui->pivotY->value());
-  ui->primitivesList->update(p, false);
-  ui->primitivesList->update(m, false);
-  Matrix3x2 pp(1, 0, 0, 1, ui->pivotX->value(), ui->pivotY->value());
-  ui->primitivesList->update(pp);
+  if (!ui->centerAsPivot->isChecked()) {
+    Matrix3x2 p(1, 0, 0, 1, -ui->pivotX->value(), -ui->pivotY->value());
+    ui->primitivesList->update(p, false, false);
+    ui->primitivesList->update(m, false, false);
+    Matrix3x2 pp(1, 0, 0, 1, ui->pivotX->value(), ui->pivotY->value());
+    ui->primitivesList->update(pp, false);
+  } else
+    ui->primitivesList->update(m, true, true);
 }

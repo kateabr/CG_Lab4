@@ -45,9 +45,13 @@ public:
     return true;
   }
 
-  void update(Matrix3x2 &tr, QModelIndexList &list) {
-    for (int i = 0; i < list.size(); ++i)
-      drawables[list[i].row()]->update(tr);
+  void update(Matrix3x2 &tr, QModelIndexList &list, bool aroundCenter) {
+    if (!aroundCenter) {
+      for (int i = 0; i < list.size(); ++i)
+        drawables[list[i].row()]->update(tr);
+    } else
+      for (int i = 0; i < list.size(); ++i)
+        drawables[list[i].row()]->updateCenter(tr);
   }
 
 private:
