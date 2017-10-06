@@ -19,6 +19,13 @@ public:
     }
   }
 
+  void intersect() {
+    if ((model()->rowCount() > 0) && (selectedIndexes().size() == 2)) {
+      static_cast<TableModel *>(model())->intersect(selectedIndexes()[0].row(),
+                                                    selectedIndexes()[1].row());
+    }
+  }
+
 signals:
   void itemsChanged();
 

@@ -3,6 +3,7 @@
 
 #include "drawable.h"
 #include "matrix3x2.h"
+#include "primitives.h"
 #include <QtWidgets>
 
 class TableModel : public QAbstractListModel {
@@ -52,6 +53,21 @@ public:
     } else
       for (int i = 0; i < list.size(); ++i)
         drawables[list[i].row()]->updateCenter(tr);
+  }
+
+  void intersect(int ind1, int ind2) {
+    if ((drawables[ind1]->whoAmI() == Primitives::Line) &&
+        (drawables[ind2]->whoAmI() == Primitives::Line)) {
+      QPair<bool, QPointF> res =
+          drawables[ind1]->intersectsWith(drawables[ind2]);
+      qDebug() << res.first;
+      if (res.first) {
+        drawables.push_back(new DrawablePoint(res.second));
+        QModelIndex top = createIndex(drawables.size() - 2, 0, nullptr);
+        QModelIndex bottom = createIndex(drawables.size() - 1, 0, nullptr);
+        emit dataChanged(top, bottom);
+      }
+    }
   }
 
 private:

@@ -17,6 +17,8 @@ public:
 private slots:
   void on_applyButton_clicked();
 
+  void on_findIntersection_clicked();
+
 private:
   Ui::MainWindow *ui;
 };

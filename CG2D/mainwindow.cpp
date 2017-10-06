@@ -15,11 +15,14 @@ MainWindow::MainWindow(QWidget *parent)
   connect(ui->selectedPoint, &QRadioButton::clicked, funPoint);
   connect(ui->selectedLine, &QRadioButton::clicked, funLine);
   connect(ui->selectedPolygon, &QRadioButton::clicked, funPolygon);
+  connect(ui->findIntersection, &QPushButton::clicked, ui->primitivesList,
+          &MyListView::intersect);
 
   TableModel *tModel = new TableModel();
 
   ui->primitivesList->setModel(tModel);
   ui->canvas->setTableModel(tModel);
+  ui->primitivesList->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   connect(ui->primitivesList, &MyListView::itemsChanged, [&]() {
     ui->canvas->clearArea();

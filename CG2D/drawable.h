@@ -2,6 +2,7 @@
 #define DRAWABLE_H
 
 #include "matrix3x2.h"
+#include "primitives.h"
 #include <QtWidgets>
 
 class Drawable {
@@ -11,6 +12,8 @@ public:
   virtual void update(Matrix3x2 &tr) = 0;
   virtual QPointF getCenter() = 0;
   virtual void updateCenter(Matrix3x2 &tr) = 0;
+  virtual Primitives whoAmI() const = 0;
+  virtual QPair<bool, QPointF> intersectsWith(Drawable *other) = 0;
 
 protected:
   QString pToStr(QPointF const &p) {
@@ -36,6 +39,12 @@ public:
   QPointF getCenter() override { return center; }
 
   void updateCenter(Matrix3x2 &tr) override { center = tr.mul(center); }
+
+  Primitives whoAmI() const override { return Primitives::Point; }
+
+  QPair<bool, QPointF> intersectsWith(Drawable *other) override {
+    return QPair<bool, QPointF>(false, QPointF(0, 0));
+  }
 
   QString toString() override { return "Point " + pToStr(center); }
 };
@@ -74,6 +83,47 @@ public:
     p1 = pp.mul(p1);
     p2 = pp.mul(p2);
   }
+
+  QPair<bool, QPointF> intersectsWith(Drawable *other) override {
+    DrawableLine otherLine = *static_cast<DrawableLine *>(other);
+    /*попарно-векторно вектор разделяющего отрезка на векторы направленные от
+     * начала разделяющего отрезка к обеим точкам проверяемого отрезка.
+     * разд отр : p1-p2
+     * p1-other p1
+     * p1-other p2
+     */
+    QPointF dividingV(qAbs(p1.x() - p2.x()), qAbs(p1.y() - p2.y()));
+    QPointF v1(qAbs(p1.x() - otherLine.p1.x()),
+               qAbs(p1.y() - otherLine.p1.y()));
+    QPointF v2(qAbs(p2.x() - otherLine.p2.x()),
+               qAbs(p2.y() - otherLine.p2.y()));
+    float a1 = dividingV.x() * v1.y() - dividingV.y() * v1.x();
+    float a2 = dividingV.x() * v2.y() - dividingV.y() * v2.x();
+    if (a1 * a2 >= 0) {
+      /*
+       * y = m1 * x + c1
+         y = m2 * x + c2
+       * intersectionX = (c2 - c1) / (m1 - m2)
+         intersectionY = m1 * intersectionX + c1
+       */
+
+      float m1 = (p1.y() - p2.y());
+      float y1 = (p2.x() - p1.x());
+      float c1 = (p1.x() * p2.y() - p2.x() * p1.y());
+      float m2 = (otherLine.p1.y() - otherLine.p2.y());
+      float y2 = (otherLine.p2.x() - otherLine.p1.x());
+      float c2 = (otherLine.p1.x() * otherLine.p2.y() -
+                  otherLine.p2.x() * otherLine.p1.y()) /
+                 (otherLine.p2.x() - otherLine.p1.x());
+
+      float intersectionX = (c2 - c1) / (m1 - m2);
+      float intersectionY = m1 * intersectionX + c1;
+      return QPair<bool, QPointF>(true, QPointF(intersectionX, intersectionY));
+    } else
+      return QPair<bool, QPointF>(false, QPointF(0, 0));
+  }
+
+  Primitives whoAmI() const override { return Primitives::Line; }
 
   QString toString() override {
     return "Line " + pToStr(p1) + " -- " + pToStr(p2);
@@ -125,6 +175,12 @@ public:
       points[i] = tr.mul(points[i]);
       points[i] = pp.mul(points[i]);
     }
+  }
+
+  Primitives whoAmI() const override { return Primitives::Polygon; }
+
+  QPair<bool, QPointF> intersectsWith(Drawable *other) override {
+    return QPair<bool, QPointF>(false, QPointF(0, 0));
   }
 
   QString toString() override {
