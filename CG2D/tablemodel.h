@@ -73,24 +73,49 @@ public:
     }
   }
 
-  void relativePos(int ind1, int ind2) {
-  DrawablePoint * p = nullptr;
-  DrawableLine * l = nullptr;
+  QString relativePos(int ind1, int ind2) {
+  DrawablePoint *p = nullptr;
+  DrawableLine *l = nullptr;
+  DrawablePolygon * poly = nullptr;
 
   if ((drawables[ind1]->whoAmI() == Primitives::Point) &&
       (drawables[ind2]->whoAmI() == Primitives::Line)) {
       p = static_cast<DrawablePoint *>(drawables[ind1]);
       l = static_cast<DrawableLine *>(drawables[ind2]);
+      return posToStr(p->relativePosition(*l));
     }
     else if ((drawables[ind1]->whoAmI() == Primitives::Line) &&
              (drawables[ind2]->whoAmI() == Primitives::Point)) {
       p = static_cast<DrawablePoint *>(drawables[ind2]);
       l = static_cast<DrawableLine *>(drawables[ind1]);
+      return posToStr(p->relativePosition(*l));
+    }
+    else if ((drawables[ind1]->whoAmI() == Primitives::Point) &&
+             (drawables[ind2]->whoAmI() == Primitives::Polygon)) {
+      p = static_cast<DrawablePoint *>(drawables[ind1]);
+      poly = static_cast<DrawablePolygon *>(drawables[ind2]);
+      return posToStr(p->relPosPolygon(*poly));
+    }
+     else if ((drawables[ind1]->whoAmI() == Primitives::Polygon) &&
+              (drawables[ind2]->whoAmI() == Primitives::Point)) {
+      p = static_cast<DrawablePoint *>(drawables[ind2]);
+      poly = static_cast<DrawablePolygon *>(drawables[ind1]);
+      return posToStr(p->relPosPolygon(*poly));
     }
   }
 
 private:
   QVector<Drawable *> drawables;
+
+  QString posToStr(Position pos) {
+      switch (pos) {
+          case Position::Left: return "Left";
+          case Position::Right: return "Right";
+          case Position::Belongs: return "Belongs";
+          case Position::Inside: return "Inside";
+          case Position::Outside: return "Outside";
+      }
+  }
 };
 
 #endif // TABLEMODEL_H

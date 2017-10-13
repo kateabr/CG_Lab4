@@ -134,53 +134,9 @@ public:
   }
 };
 
-class DrawablePoint : public Drawable {
-private:
-  QPointF center;
-
-public:
-  DrawablePoint(QPointF p) : center(p) {}
-  void draw(QPixmap &pixmap) const override {
-    QPainter p(&pixmap);
-    p.setBrush(QBrush(Qt::black));
-    p.setPen(Qt::black);
-    p.drawEllipse(center, 3, 3);
-  }
-
-  void update(Matrix3x2 &tr) override { center = tr.mul(center); }
-
-  QPointF getCenter() override { return center; }
-
-  void updateCenter(Matrix3x2 &tr) override { center = tr.mul(center); }
-
-  Primitives whoAmI() const override { return Primitives::Point; }
-
-  QPair<bool, QPointF> intersectsWith(Drawable *other) override {
-    return QPair<bool, QPointF>(false, QPointF(0, 0));
-  }
-
-  Position relativePosition(DrawableLine const & line) {
-      float a = line.p2.y() - line.p1.y();
-      float b = line.p1.x() - line.p2.x();
-      float c = - line.p2.x() * a - line.p2.y() * b;
-      if (line.p2.y() < line.p1.y()) {
-          a *= -1;
-          b *= -1;
-          c *= -1;
-      }
-      float t = a * center.x() + b * center.y() + c;
-      if (t < 0)
-          return Position::Left;
-      else if (t > 0)
-          return Position::Right;
-      else
-          return Position::Belongs;
-  }
-
-  QString toString() override { return "Point " + pToStr(center); }
-};
-
 class DrawablePolygon : public Drawable {
+friend class DrawablePoint;
+
 private:
   QVector<QPointF> points;
 
@@ -236,6 +192,80 @@ public:
   QString toString() override {
     return "Polygon (" + QString::number(points.size()) + " angles)";
   }
+};
+
+class DrawablePoint : public Drawable {
+private:
+  QPointF center;
+
+public:
+  DrawablePoint(QPointF p) : center(p) {}
+  void draw(QPixmap &pixmap) const override {
+    QPainter p(&pixmap);
+    p.setBrush(QBrush(Qt::black));
+    p.setPen(Qt::black);
+    p.drawEllipse(center, 3, 3);
+  }
+
+  void update(Matrix3x2 &tr) override { center = tr.mul(center); }
+
+  QPointF getCenter() override { return center; }
+
+  void updateCenter(Matrix3x2 &tr) override { center = tr.mul(center); }
+
+  Primitives whoAmI() const override { return Primitives::Point; }
+
+  QPair<bool, QPointF> intersectsWith(Drawable *other) override {
+    return QPair<bool, QPointF>(false, QPointF(0, 0));
+  }
+
+  Position relativePosition(DrawableLine const & line) {
+      float a = line.p2.y() - line.p1.y();
+      float b = line.p1.x() - line.p2.x();
+      float c = - line.p2.x() * a - line.p2.y() * b;
+      if (line.p2.y() < line.p1.y()) {
+          a *= -1;
+          b *= -1;
+          c *= -1;
+      }
+      float t = a * center.x() + b * center.y() + c;
+      if (t < 0)
+          return Position::Left;
+      else if (t > 0)
+          return Position::Right;
+      else
+          return Position::Belongs;
+  }
+
+  Position relPosPolygon(DrawablePolygon const & poly) {
+      QPointF r = poly.points[0];
+      for (int i = 1; i < poly.points.size(); ++i)
+          if (poly.points[i].x() > r.x())
+              r = poly.points[i];
+      DrawableLine line(center, QPointF(r.x() + 1, r.y()));
+
+      int inters = 0;
+      for (int i = 0; i < poly.points.size(); ++i) {
+          DrawableLine line2(DrawableLine(poly.points[i],
+                                          poly.points[(i + 1) % poly.points.size()]));
+          DrawablePoint p1(line2.p1);
+          DrawablePoint p2(line2.p2);
+          bool b(line.intersectsWith(&line2).first);
+          if (b && (p1.relativePosition(line) == Position::Left
+                  && (p2.relativePosition(line) == Position::Right
+                      || p2.relativePosition(line) == Position::Belongs)
+              || p2.relativePosition(line) == Position::Left
+              && (p1.relativePosition(line) == Position::Right
+                  || p1.relativePosition(line) == Position::Belongs)))
+              ++inters;
+      }
+      if (inters % 2 == 0)
+          return Position::Outside;
+      else
+          return Position::Inside;
+  }
+
+  QString toString() override { return "Point " + pToStr(center); }
 };
 
 #endif // DRAWABLE_H

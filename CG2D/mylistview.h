@@ -27,10 +27,10 @@ public:
     emit itemsChanged();
   }
 
-  void relativePos() {
+  QString relativePos() {
       if ((model()->rowCount() > 0) && (selectedIndexes().size() == 2)) {
-          static_cast<TableModel *>(model())->relativePos(selectedIndexes()[0].row(),
-                                                          selectedIndexes()[1].row());
+          return static_cast<TableModel *>(model())->relativePos(selectedIndexes()[0].row(),
+                                                                 selectedIndexes()[1].row());
       }
   }
 

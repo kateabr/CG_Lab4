@@ -18,6 +18,9 @@ MainWindow::MainWindow(QWidget *parent)
   connect(ui->selectedPolygon, &QRadioButton::clicked, funPolygon);
   connect(ui->findIntersection, &QPushButton::clicked, ui->primitivesList,
           &MyListView::intersect);
+  connect(ui->findRelPos, &QPushButton::clicked, [&]() {
+      ui->label_pos->setText("Position: " + ui->primitivesList->relativePos());
+  });
 
   TableModel *tModel = new TableModel();
 
