@@ -24,6 +24,14 @@ public:
       static_cast<TableModel *>(model())->intersect(selectedIndexes()[0].row(),
                                                     selectedIndexes()[1].row());
     }
+    emit itemsChanged();
+  }
+
+  void relativePos() {
+      if ((model()->rowCount() > 0) && (selectedIndexes().size() == 2)) {
+          static_cast<TableModel *>(model())->relativePos(selectedIndexes()[0].row(),
+                                                          selectedIndexes()[1].row());
+      }
   }
 
 signals:

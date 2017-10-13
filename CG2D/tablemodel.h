@@ -53,6 +53,9 @@ public:
     } else
       for (int i = 0; i < list.size(); ++i)
         drawables[list[i].row()]->updateCenter(tr);
+    QModelIndex top = createIndex(drawables.size() - 1, 0, nullptr);
+    QModelIndex bottom = createIndex(drawables.size() - 1, 0, nullptr);
+    emit dataChanged(top, bottom);
   }
 
   void intersect(int ind1, int ind2) {
@@ -67,6 +70,22 @@ public:
         QModelIndex bottom = createIndex(drawables.size() - 1, 0, nullptr);
         emit dataChanged(top, bottom);
       }
+    }
+  }
+
+  void relativePos(int ind1, int ind2) {
+  DrawablePoint * p = nullptr;
+  DrawableLine * l = nullptr;
+
+  if ((drawables[ind1]->whoAmI() == Primitives::Point) &&
+      (drawables[ind2]->whoAmI() == Primitives::Line)) {
+      p = static_cast<DrawablePoint *>(drawables[ind1]);
+      l = static_cast<DrawableLine *>(drawables[ind2]);
+    }
+    else if ((drawables[ind1]->whoAmI() == Primitives::Line) &&
+             (drawables[ind2]->whoAmI() == Primitives::Point)) {
+      p = static_cast<DrawablePoint *>(drawables[ind2]);
+      l = static_cast<DrawableLine *>(drawables[ind1]);
     }
   }
 

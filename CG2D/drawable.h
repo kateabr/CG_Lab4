@@ -21,35 +21,9 @@ protected:
   }
 };
 
-class DrawablePoint : public Drawable {
-private:
-  QPointF center;
-
-public:
-  DrawablePoint(QPointF p) : center(p) {}
-  void draw(QPixmap &pixmap) const override {
-    QPainter p(&pixmap);
-    p.setBrush(QBrush(Qt::black));
-    p.setPen(Qt::black);
-    p.drawEllipse(center, 3, 3);
-  }
-
-  void update(Matrix3x2 &tr) override { center = tr.mul(center); }
-
-  QPointF getCenter() override { return center; }
-
-  void updateCenter(Matrix3x2 &tr) override { center = tr.mul(center); }
-
-  Primitives whoAmI() const override { return Primitives::Point; }
-
-  QPair<bool, QPointF> intersectsWith(Drawable *other) override {
-    return QPair<bool, QPointF>(false, QPointF(0, 0));
-  }
-
-  QString toString() override { return "Point " + pToStr(center); }
-};
-
 class DrawableLine : public Drawable {
+friend class DrawablePoint;
+
 private:
   QPointF p1, p2;
 
@@ -92,14 +66,14 @@ public:
      * p1-other p1
      * p1-other p2
      */
-    QPointF dividingV(qAbs(p1.x() - p2.x()), qAbs(p1.y() - p2.y()));
+    /*QPointF dividingV(qAbs(p1.x() - p2.x()), qAbs(p1.y() - p2.y()));
     QPointF v1(qAbs(p1.x() - otherLine.p1.x()),
                qAbs(p1.y() - otherLine.p1.y()));
     QPointF v2(qAbs(p2.x() - otherLine.p2.x()),
                qAbs(p2.y() - otherLine.p2.y()));
     float a1 = dividingV.x() * v1.y() - dividingV.y() * v1.x();
     float a2 = dividingV.x() * v2.y() - dividingV.y() * v2.x();
-    if (a1 * a2 >= 0) {
+    if (a1 * a2 >= 0) { }*/
       /*
        * y = m1 * x + c1
          y = m2 * x + c2
@@ -107,20 +81,50 @@ public:
          intersectionY = m1 * intersectionX + c1
        */
 
-      float m1 = (p1.y() - p2.y());
-      float y1 = (p2.x() - p1.x());
-      float c1 = (p1.x() * p2.y() - p2.x() * p1.y());
-      float m2 = (otherLine.p1.y() - otherLine.p2.y());
-      float y2 = (otherLine.p2.x() - otherLine.p1.x());
-      float c2 = (otherLine.p1.x() * otherLine.p2.y() -
-                  otherLine.p2.x() * otherLine.p1.y()) /
-                 (otherLine.p2.x() - otherLine.p1.x());
+      float intersectionX, intersectionY;
 
-      float intersectionX = (c2 - c1) / (m1 - m2);
-      float intersectionY = m1 * intersectionX + c1;
-      return QPair<bool, QPointF>(true, QPointF(intersectionX, intersectionY));
-    } else
-      return QPair<bool, QPointF>(false, QPointF(0, 0));
+      float dx1 = p2.x() - p1.x();
+      float dx2 = otherLine.p2.x() - otherLine.p1.x();
+      if (dx1 == 0 && dx2 == 0)
+          return QPair<bool, QPointF>(false, QPointF(0, 0));
+
+      float m1 = dx1 != 0 ? (p2.y() - p1.y()) / dx1 : 0;
+      float c1 = p1.y() - p1.x() * m1;
+
+      float m2 = dx2 != 0 ? (otherLine.p2.y() - otherLine.p1.y()) / dx2 : 0;
+      float c2 = otherLine.p1.y() - otherLine.p1.x() * m2;
+
+      if (m1 == m2)
+          return QPair<bool, QPointF>(false, QPointF(0, 0));
+
+      if (dx1 == 0) {
+          intersectionX = p2.x();
+          intersectionY = m2 * intersectionX + c2;
+      }
+      else {
+          if (dx2 == 0)
+              intersectionX = otherLine.p2.x();
+          else
+              intersectionX = (c2 - c1) / (m1 - m2);
+
+          intersectionY = m1 * intersectionX + c1;
+      }
+
+      QPointF luBound(qMax(qMin(p1.x(), p2.x()),
+                           qMin(otherLine.p1.x(), otherLine.p2.x())),
+                      qMax(qMin(p1.y(), p2.y()),
+                           qMin(otherLine.p1.y(), otherLine.p2.y())));
+      QPointF rdBound(qMin(qMax(p1.x(), p2.x()),
+                           qMax(otherLine.p1.x(), otherLine.p2.x())),
+                      qMin(qMax(p1.y(), p2.y()),
+                           qMax(otherLine.p1.y(), otherLine.p2.y())));
+
+      if (intersectionX >= luBound.x() && intersectionX <= rdBound.x() &&
+          intersectionY >= luBound.y() && intersectionY <= rdBound.y())
+          return QPair<bool, QPointF>(true,
+                                      QPointF(intersectionX, intersectionY));
+      else
+          return QPair<bool, QPointF>(false, QPointF(0, 0));
   }
 
   Primitives whoAmI() const override { return Primitives::Line; }
@@ -128,6 +132,52 @@ public:
   QString toString() override {
     return "Line " + pToStr(p1) + " -- " + pToStr(p2);
   }
+};
+
+class DrawablePoint : public Drawable {
+private:
+  QPointF center;
+
+public:
+  DrawablePoint(QPointF p) : center(p) {}
+  void draw(QPixmap &pixmap) const override {
+    QPainter p(&pixmap);
+    p.setBrush(QBrush(Qt::black));
+    p.setPen(Qt::black);
+    p.drawEllipse(center, 3, 3);
+  }
+
+  void update(Matrix3x2 &tr) override { center = tr.mul(center); }
+
+  QPointF getCenter() override { return center; }
+
+  void updateCenter(Matrix3x2 &tr) override { center = tr.mul(center); }
+
+  Primitives whoAmI() const override { return Primitives::Point; }
+
+  QPair<bool, QPointF> intersectsWith(Drawable *other) override {
+    return QPair<bool, QPointF>(false, QPointF(0, 0));
+  }
+
+  Position relativePosition(DrawableLine const & line) {
+      float a = line.p2.y() - line.p1.y();
+      float b = line.p1.x() - line.p2.x();
+      float c = - line.p2.x() * a - line.p2.y() * b;
+      if (line.p2.y() < line.p1.y()) {
+          a *= -1;
+          b *= -1;
+          c *= -1;
+      }
+      float t = a * center.x() + b * center.y() + c;
+      if (t < 0)
+          return Position::Left;
+      else if (t > 0)
+          return Position::Right;
+      else
+          return Position::Belongs;
+  }
+
+  QString toString() override { return "Point " + pToStr(center); }
 };
 
 class DrawablePolygon : public Drawable {
